@@ -1,0 +1,4 @@
+function d = dsigmoid(z)
+    % This function computes first derivative of sigmoid function at z
+    d = exp(x) / (exp(z) +1);
+end

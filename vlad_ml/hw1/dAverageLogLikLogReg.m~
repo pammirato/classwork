@@ -1,0 +1,6 @@
+function [dbeta0,dbeta] = dAverageLogLikLogReg(y,X,beta0,beta)
+    dbeta0 = -y*(1 - AverageLogLikLogReg(y,X,beta0,beta));
+    for i=1:length(beta)
+        dbeta(i) =( -y*X(:,j) )* (1 - AverageLogLikLogReg(y,X,beta0,beta));
+    end
+end
