@@ -1,8 +1,0 @@
-function num_error = eval(Y,X,beta0,beta);
-
-
-    guess = x * [beta0
-
-
-
-end%eval

@@ -23,7 +23,7 @@ function [beta0,beta] = fitLogReg(trainY,trainX,lambda,s)
     %keeps track of how much we are improving our solution
     improvement = convergence_thresh *2; %make it over the thresh to start
     
-    while((improvement > convergence_thresh) && (cur_iter < max_iter))
+    while((1) && (cur_iter < max_iter))
         
         %get gradients
         [dBeta0, dBeta] = dAverageLogLikLogReg(trainY,trainX,beta0,beta,lambda); 

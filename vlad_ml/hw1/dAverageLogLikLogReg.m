@@ -1,12 +1,12 @@
 function [dbeta0,dbeta] = dAverageLogLikLogReg(y,X,beta0,beta,lambda)
-    dbeta0 = -y*(1 - AverageLogLikLogReg(y,X,beta0,beta,lambda));
-    dbeta = zeros(length(beta));
-    for i=1:length(beta)
-        i
-        yx = -y'*X(:,i);
-        N = length(y);
-        ridge_penalty = -2*lambda*beta(i);
-        dbeta(i) = (yx * (N - AverageLogLikLogReg(y,X,beta0,beta,lambda)) )  - ridge_penalty;
-        %dbeta(i) =( -y*X(:,j) )* ( length(y) - AverageLogLikLogReg(y,X,beta0,beta) );
-    end
+    prob =  ones(length(y),1) ./ (1 + exp(-y.*(beta0 + beta*x')'));
+    
+    N = 1/ length(y);
+    
+    dbeta0 =(1/N) * sum(((1-prob).*y)');
+    
+    dbeta =(1/N) * ((1-prob).*y)' * X;
+    
+    
 end
+
