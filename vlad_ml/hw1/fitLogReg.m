@@ -2,9 +2,10 @@ function [beta0,beta] = fitLogReg(trainY,trainX,lambda,s)
 
     %initialization of betas  - random
     scale = 100;
-    beta0 = randn(1)/scale;
-    beta = randn(1,size(trainX,2))/scale;
+    beta0 =0;% randn(1)/scale;
+    beta = zeros(1,size(trainX,2));%randn(1,size(trainX,2))/scale;
     
+    %trainX = trainX /255;
     
     %set a threshold for convergence
     convergence_thresh = 1e-1;
@@ -30,7 +31,7 @@ function [beta0,beta] = fitLogReg(trainY,trainX,lambda,s)
         
         %move a step in gradient direction
         beta0 = beta0 + s*dBeta0;
-        beta  = beta  + s*beta;
+        beta  = beta  + s*dBeta;
         
         
         cur_ll = AverageLogLikLogReg(trainY,trainX,beta0,beta,lambda);

@@ -1,12 +1,7 @@
-function num_error = eval(Y,X,beta0,beta);
+guess = [ones(size(testX,1),1) testX] * [beta0s(4,1) betas{4,1}]';
 
+        diff = testy - sign(guess);
 
-    guess = [ones(size(X,1),1) X] * [beta0 beta]';
-    
-    diff = Y - sign(guess);
-    
-    num_error = sum(diff)/2;
+        num_wrong = sum(abs(diff))/2;
 
-
-
-end%eval
+       test_error= num_wrong/length(validy)
