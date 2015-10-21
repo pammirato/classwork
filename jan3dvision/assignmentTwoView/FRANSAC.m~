@@ -46,14 +46,14 @@ function [F,inliers]=FRANSAC(matchedPoints1, matchedPoints2,probSol,threshold)
             
             
         %b)
+        %left = helper(norm_points1',norm_points2');
         left = helper(norm_points1',norm_points2');
-        
         
         [~, ~, eigv] = svd(left,0);
         f = eigv(:,end);
         
         %reshape
-        f = reshape(f,3,3);
+        f = reshape(f,3,3)';
         
         %rank 2
         [u, s, v] = svd(f);
@@ -78,10 +78,8 @@ function [F,inliers]=FRANSAC(matchedPoints1, matchedPoints2,probSol,threshold)
         
        
         test_results = test_left * unrolled_F;
+     
         
-        
-        test_results2 = [test_points1 ones(1,length(test_points1)) ]' ...
-                        * F * [test_points2 ones(1,length(test_points2)) ];
         
         thresholded_results = test_results;
         thresholded_results(abs(thresholded_results) > threshold) = 0;
@@ -122,8 +120,8 @@ function [F,inliers]=FRANSAC(matchedPoints1, matchedPoints2,probSol,threshold)
     inliers = best_inliers;
     
 end   %FRANSAC funcition
-
-%xx', xy', x, yx', yy', y, x', y',1
+% 
+% %xx', xy', x, yx', yy', y, x', y',1
 function result = helper(set1, set2)
     result = [set1(:,1).*set2(:,1) ...
               set1(:,1).*set2(:,2) ...
@@ -135,12 +133,15 @@ function result = helper(set1, set2)
               set2(:,2) ...
               ones(size(set1,1),1)];
           
-end  
+end 
+ 
 
 
-% %xx', xy', x, yx', yy', y, x', y',1
-% function result = helper_matrix(group1, group2)
-%     result = [group1(:,:,1).*set2(:,1) ...
+
+
+% %x'x, x'y, x', y'x, y'y, y', x, y, 1
+% function result = helper(set1, set2)
+%     result = [set1(:,1).*set2(:,1) ...
 %               set1(:,1).*set2(:,2) ...
 %               set1(:,1) ...
 %               set1(:,2).*set2(:,1) ...
@@ -151,6 +152,8 @@ end
 %               ones(size(set1,1),1)];
 %           
 % end  
+
+
 
 
 

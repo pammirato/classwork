@@ -46,8 +46,8 @@ function [F,inliers]=FRANSAC(matchedPoints1, matchedPoints2,probSol,threshold)
             
             
         %b)
-        left = helper(norm_points1',norm_points2');
-        
+        %left = helper(norm_points1',norm_points2');
+        left = helper(norm_points2',norm_points1');
         
         [~, ~, eigv] = svd(left,0);
         f = eigv(:,end);
@@ -57,11 +57,13 @@ function [F,inliers]=FRANSAC(matchedPoints1, matchedPoints2,probSol,threshold)
         
         %rank 2
         [u, s, v] = svd(f);
+        %s(1,1) =1;
+        %s(2,2) = 1;
         s(end) = 0;
-        norm_f = u*s*v;
+        norm_f = u*s*v';
         
         
-        F = transform2 * norm_f * transform1;
+        F = transform2' * norm_f * transform1;
             
         
         %lose the points used to generate F
@@ -78,17 +80,7 @@ function [F,inliers]=FRANSAC(matchedPoints1, matchedPoints2,probSol,threshold)
         
        
         test_results = test_left * unrolled_F;
-        
-%         m = [test_points1 ;ones(1,length(test_points1)) ]';
-%         m2 = [test_points2 ;ones(1,length(test_points2)) ];
-%         test_results2 =  m * F *m2 ;
-%                     
-%         test_results2 = diag(test_results2);
-%         
-%         thresholded_results2 = test_results2;
-%         thresholded_results2(abs(thresholded_results2) > threshold) = 0;
-%         
-%         inliers = find(thresholded_results2);
+     
         
         
         thresholded_results = test_results;
@@ -130,8 +122,8 @@ function [F,inliers]=FRANSAC(matchedPoints1, matchedPoints2,probSol,threshold)
     inliers = best_inliers;
     
 end   %FRANSAC funcition
-
-%xx', xy', x, yx', yy', y, x', y',1
+% 
+% %xx', xy', x, yx', yy', y, x', y',1
 function result = helper(set1, set2)
     result = [set1(:,1).*set2(:,1) ...
               set1(:,1).*set2(:,2) ...
@@ -143,12 +135,15 @@ function result = helper(set1, set2)
               set2(:,2) ...
               ones(size(set1,1),1)];
           
-end  
+end 
+ 
 
 
-% %xx', xy', x, yx', yy', y, x', y',1
-% function result = helper_matrix(group1, group2)
-%     result = [group1(:,:,1).*set2(:,1) ...
+
+
+% %x'x, x'y, x', y'x, y'y, y', x, y, 1
+% function result = helper(set1, set2)
+%     result = [set1(:,1).*set2(:,1) ...
 %               set1(:,1).*set2(:,2) ...
 %               set1(:,1) ...
 %               set1(:,2).*set2(:,1) ...
@@ -164,13 +159,18 @@ end
 
 
 
+
+
 function transform = get_normaliztion_transform(points)
 
     transform = zeros(3,3);
     
     m = mean(points');
+
+    points(1,:) = points(1,:) - m(1);
+    points(2,:) = points(2,:) - m(2);
     
-    dists = sqrt(points(:,1).^2 + points(:,2).^2 );
+    dists = sqrt(points(1,:).^2 + points(2,:).^2 );
     scale = sqrt(2)/mean(dists);
     
     transform(1,1) = scale;%scalex;
@@ -178,6 +178,7 @@ function transform = get_normaliztion_transform(points)
     transform(2,2) = scale;%scaley;
     transform(2,3) = -m(2) *scale;%transx;
     transform(3,3) = 1;% [1 1 1];
+    %transform(3,:) = [1 1 1];
     
 
 
