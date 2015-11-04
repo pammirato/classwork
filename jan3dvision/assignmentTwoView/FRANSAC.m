@@ -16,8 +16,15 @@ function [F,inliers]=FRANSAC(matchedPoints1, matchedPoints2,probSol,threshold)
     best_F = eye(3,3);
     %F=eye(3);
     best_inliers = 0;
+    
+    
+    
+    N = 99999;
+    sample_count = 0;
+    
+    while (N> sample_count)
 
-    for i=1:10000
+    %for i=1:10
 
     %1) Select a random minimal set from all potential correspondences
     rand_indices = randi(length(matchedPoints1),[1 8]);
@@ -30,15 +37,19 @@ function [F,inliers]=FRANSAC(matchedPoints1, matchedPoints2,probSol,threshold)
             %i) shift mean to [0,0]
             %init_all = init_all - mean(init_all);
 
+            %get normalization transformation
             transform1 = get_normaliztion_transform(points1);
             transform2 = get_normaliztion_transform(points2);
             
+            %convvert point to homogenous coords
             homog1 = [points1; ones(1,length(points1))];
             homog2 = [points2; ones(1,length(points2))];
             
+            %normalize points
             norm_points1 = transform1 * homog1;
             norm_points2 = transform2 * homog2;
 
+            %convert back from homogenous coords
             norm_points1 = norm_points1(1:2,:);
             norm_points2 = norm_points2(1:2,:);
             
@@ -47,22 +58,20 @@ function [F,inliers]=FRANSAC(matchedPoints1, matchedPoints2,probSol,threshold)
             
         %b)
         %left = helper(norm_points1',norm_points2');
-        left = helper(norm_points2',norm_points1');
+        left = helper(norm_points1',norm_points2');
         
-        [~, ~, eigv] = svd(left,0);
+        [~, ~, eigv] = svd(left);
         f = eigv(:,end);
         
         %reshape
         f = reshape(f,3,3)';
         
-        %rank 2
+        %ensure rank 2 constraint
         [u, s, v] = svd(f);
-        %s(1,1) =1;
-        %s(2,2) = 1;
         s(end) = 0;
         norm_f = u*s*v';
         
-        
+        %get the un-normalized F
         F = transform2' * norm_f * transform1;
             
         
@@ -73,51 +82,37 @@ function [F,inliers]=FRANSAC(matchedPoints1, matchedPoints2,probSol,threshold)
         test_points2 = matchedPoints2';
         test_points2(:,rand_indices) = [];
         
+        %normalize test points
+        norm_test2  = transform2 * [test_points2; ones(1,length(test_points2))];;
+        norm_test1  = transform1 * [test_points1; ones(1,length(test_points1))];;
         
-        test_left = helper(test_points1',test_points2');
+        %do testing
+        test_results = norm_test1' * norm_f * norm_test2;
+        test_results = diag(test_results);
         
-        unrolled_F = reshape(F',9,1);
-        
-       
-        test_results = test_left * unrolled_F;
-     
-        
-        
+         %threshold for inliers    
         thresholded_results = test_results;
-        thresholded_results(abs(thresholded_results) > threshold) = 0;
+        thresholded_results(abs(thresholded_results) > (threshold/100)) = 0;
         
         inliers = find(thresholded_results);
-        
+       
+        %see if this is the best so far
         if(length(inliers) > length(best_inliers))
             best_inliers = inliers;
             best_F = F; 
         end
         
+        %adaptively determingly number of samples
+        e =1- ( length(inliers) / length(test_points1) );
         
+        N = log(1-probSol) / log(1-((1-e)^8));
         
-            
-%         %randomly permutate the remaining points
-%         rand_order = randperm(length(test_points1));
-% 
-%         test_points1 = test_points1(:,rand_order);
-%         test_points2 = test_points2(:,rand_order);
-%         
-%         truncate = mod(length(test_points1),8);
-%         num_groups = floor(length(test_points1)/8);
-%         
-%         test_groups1 = reshape(test_points1(:,1:end-truncate),2,8,num_groups);
-%         test_groups2 = reshape(test_points2(:,1:end-truncate),2,8,num_groups);
-%         
-        
-        
-
-
+        sample_count = sample_count + 1;
+         
     
+    end
     
-    
-    end%for i = 1000
-    
-    
+    %return the best stuff
     F = best_F;
     inliers = best_inliers;
     

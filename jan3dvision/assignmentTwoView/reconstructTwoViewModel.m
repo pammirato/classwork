@@ -267,7 +267,7 @@ function []= VisualizeMatchedFeatures(image1, image2, matchedPoints1, matchedPoi
     plot(matchedPoints2(index,1)+size(image1,2),matchedPoints2(index,2),'*')
 
     % plot lines
-    for i = 1 :10: size(index,2)
+    for i = 1 : size(index,2)
        plot([matchedPoints1(index(i),1),matchedPoints2(index(i),1)+size(image1,2)],...
            [matchedPoints1(index(i),2),matchedPoints2(index(i),2)]);
     end

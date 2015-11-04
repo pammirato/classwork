@@ -14,10 +14,12 @@ function [idxs] = PutativeMatchSURF(features1,features2)
 
     %thresh = double(.05);
    
-    
+    %find nearest neighnor in both directions
     [nn_of_2_in_1 dists]  = knnsearch(features1,features2);
     [nn_of_1_in_2 dists]  = knnsearch(features2,features1);
     
+    
+    %only keep points that were each others nearset neighbors
     two_way_nn_of_1_in_2 = nn_of_1_in_2;
     
     for i=1:length(nn_of_1_in_2)
