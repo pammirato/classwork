@@ -2,18 +2,20 @@
 %load_all;
 
 
-ref_index = 5;
+ref_index = 16;
+
+
 ref_img = all_images(:,:,:,ref_index);
 ref_data = all_camera_data(ref_index,:);
 
-other_imgs = all_images(:,:,:,1:10);
-other_imgs(:,:,:,ref_index) = [];
+other_imgs = all_images(:,:,:,11:21);
+other_imgs(:,:,:,ref_index-10) = [];
 
-other_data = all_camera_data(:,1:10);
-other_data(ref_index,:) = [];
+other_data = all_camera_data(:,11:21);
+other_data(ref_index-10,:) = [];
 
 
-down_sample_rate = 2;
+down_sample_rate = 4;
 
 ref_P = reshape(ref_data(1:12),3,4);
 ref_K = reshape(ref_data(13:21),3,3);
@@ -34,7 +36,7 @@ org_ref_C = ref_C;
 
 
 
-plane_distances = [5:.5:12 13:20]; % [1:.5:5];
+plane_distances = [5:1:10 11:2:31 32:4:50 51:10:100]; % [1:.5:5];
 plane_normal = [0 0 1];
 
 
@@ -83,7 +85,7 @@ for i =1:length(plane_distances)
         R = reshape(camera_data(22:30),3,3);
         C = camera_data(31:end)';
         
-        assert(max(max(abs(P - K*[R' -R'*C]))) < .1);
+        assert(max(max(abs(P - K*[R' -R'*C]))) < .5);
         
         
         aug_matrix = transform_matrix * [R C; 0,0,0,1];
