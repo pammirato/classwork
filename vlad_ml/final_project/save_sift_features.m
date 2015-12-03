@@ -2,7 +2,7 @@
 
 init;
 
-object_name = 'softsoap_gold';  %make this = 'all' to go through all rooms
+object_name = 'all';  %make this = 'all' to go through all rooms
 
 
 
@@ -43,7 +43,7 @@ for i=1:num_objects
     
     for j=1:length(all_names)
         cur_name = all_names{j};
-        [frames, descriptors] = getFeatures(imread(fullfile(object_path,cur_name)));
+        [frames, descriptors] = getFeatures(imread(fullfile(object_path,cur_name)),'peakThreshold', 0.01);
         
         save(fullfile(object_path,strcat(cur_name(1:end-4),'_sift.mat')),'frames','descriptors');
     end% j

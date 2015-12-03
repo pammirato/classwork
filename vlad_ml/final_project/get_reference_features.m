@@ -1,7 +1,7 @@
 
 
 
-function [ref_frames, ref_descriptors,ref_labels] = get_reference_features(object_names, indices)
+function [ref_frames, ref_descriptors,ref_labels] = get_reference_features(object_names, indices,bboxes)
 
     init;
 
@@ -35,8 +35,12 @@ function [ref_frames, ref_descriptors,ref_labels] = get_reference_features(objec
             
             file_name = train_names{indices(j)};
             
-            features = load(fullfile(object_path,strcat(file_name(1:end-4),'_sift.mat')));
-        
+            if(bboxes)
+                file_name = strcat('bb_',file_name(1:end-4),'_sift.mat');
+                features = load(fullfile(object_path,GROUND_TRUTH_BBOXES_DIR,file_name));
+            else
+                features = load(fullfile(object_path,strcat(file_name(1:end-4),'_sift.mat')));
+            end
             ref_frames{(i-1)*n +j} = features.frames;
             ref_descriptors{(i-1)*n +j} = features.descriptors;
             ref_labels{(i-1)*n +j} = object_name;
